@@ -1,0 +1,32 @@
+{
+    "data": {
+        "input_dir": ".",
+        "train_file": "train.csv",
+        "test_file": "test.csv",
+        "validation_size": 0.3,
+        "random_state": 1
+    },
+    "experiment": {
+        "expr_dir": "./experiments",
+        "expr_name": "house_mlp_v1",
+        "best_model_file": "./best_model.pt",
+        "params_file": "params.json",
+        "save_figures": true,
+        "images_dir": "images",
+        "figure_dpi": 150,
+        "submission_file": "submission.csv",
+        "submission_dir": "."
+    },
+    "wandb": {
+        "mode": "disabled",
+        "project": "house-pytorch"
+    },
+    "train": {
+        "hidden1": 32,
+        "hidden2": 16,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "epochs": 100,
+        "weight_decay": 0.0001
+    }
+}
