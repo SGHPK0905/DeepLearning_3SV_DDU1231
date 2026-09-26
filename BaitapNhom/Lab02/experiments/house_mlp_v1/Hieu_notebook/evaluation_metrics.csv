@@ -1,0 +1,2 @@
+model,validation_rows,rmse_log1p,mae_log1p,rmse_usd,mae_usd
+MLP + XGBoost + Lasso,437,0.1183416084049267,0.07785356459328428,19585.990674009467,12917.534844534954
