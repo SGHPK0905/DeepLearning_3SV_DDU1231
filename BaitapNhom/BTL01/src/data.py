@@ -119,7 +119,6 @@ def load_csv(path: Path):
     """
     path = Path(path)
     if not path.is_file():
-        # Fallback thử tìm trong thư mục DATA_DIR nếu truyền tên file tương đối
         alt_path = DATA_DIR / path.name
         if alt_path.is_file():
             path = alt_path
