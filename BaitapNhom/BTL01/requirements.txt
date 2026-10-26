@@ -1,0 +1,9 @@
+# Requirements for BTL01 - Deep Learning (Function Approximation MLP)
+torch>=2.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+matplotlib>=3.7.0
+openpyxl>=3.1.0
+tqdm>=4.65.0
+
