@@ -219,6 +219,7 @@ def plot_error_surface_3d(
     scaler=None,
     device: str = "cpu",
     grid_points: int = 80,
+    title_suffix: str = "",
     save_path: Optional[Union[str, Path]] = None,
 ):
     """
@@ -257,7 +258,7 @@ def plot_error_surface_3d(
     ax.set_xlabel("$X_1$", fontsize=11, fontweight="bold", labelpad=8)
     ax.set_ylabel("$X_2$", fontsize=11, fontweight="bold", labelpad=8)
     ax.set_zlabel("Sai số tuyệt đối", fontsize=11, fontweight="bold", labelpad=8)
-    ax.set_title("Bề mặt sai số tuyệt đối của mô hình MLP", fontsize=12, fontweight="bold", pad=15)
+    ax.set_title(f"Bề mặt sai số tuyệt đối của mô hình MLP {title_suffix}".strip(), fontsize=12, fontweight="bold", pad=15)
     ax.view_init(elev=28, azim=-120)
 
     fig.tight_layout()

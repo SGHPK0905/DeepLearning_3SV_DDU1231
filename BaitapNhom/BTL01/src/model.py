@@ -2,7 +2,7 @@
 """
 src/model.py
 ------------
-Giai đoạn 2 - Kiến trúc mô hình MLP tổng quát (Thanh Phương phụ trách).
+Kiến trúc mô hình MLP tổng quát.
 
 Dùng chung cho cả 3 thực nghiệm A, B, C:
 - Số lượng tầng ẩn / số nơ-ron mỗi tầng được cấu hình linh hoạt qua tham số `hidden_layers`.
@@ -63,6 +63,10 @@ class MLPRegressor(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+    def count_parameters(self) -> int:
+        """Đếm tổng số tham số có thể huấn luyện (learnable parameters)."""
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def extra_repr(self) -> str:
         return (
