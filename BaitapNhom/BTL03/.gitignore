@@ -1,0 +1,17 @@
+# Ignore large binary checkpoints and cached datasets for GitHub limits
+data/*.csv
+data/*.npz
+data/preprocessing/*.npz
+checkpoints/*.pt
+!checkpoints/.gitkeep
+!data/.gitkeep
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary office and system files
+~$*
+*.tmp
+.DS_Store
