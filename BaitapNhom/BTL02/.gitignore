@@ -1,0 +1,10 @@
+# Ignore large data and model checkpoint files for GitHub limits
+data/*.csv
+data/preprocessing/*.npz
+checkpoints/*.pt
+!checkpoints/.gitkeep
+!data/.gitkeep
+
+# Temporary files
+~$*
+*.tmp
