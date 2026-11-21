@@ -1,0 +1,4 @@
+Augmentation_Mode,Final_Train_Acc_Pct,Final_Val_Acc_Pct,Overfitting_Gap_Pct,Test_Acc_Pct,Macro_F1_Pct
+none,74.2,56.4,17.8,55.8,52.9
+basic,69.5,61.35,8.15,60.88,58.74
+advanced,68.2,63.2,5.0,62.9,60.85

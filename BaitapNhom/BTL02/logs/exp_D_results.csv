@@ -1,0 +1,5 @@
+Regularization_Setup,Best_Val_Loss,Best_Val_Acc_Pct,Test_Acc_Pct,Macro_F1_Pct
+Dropout_Low (0.1),1.102,58.9,58.4,55.8
+Dropout_Standard (0.25),1.0542,61.35,60.88,58.74
+Dropout_High (0.4),1.128,57.8,57.3,55.1
+No_BatchNorm (Ablation),1.245,52.1,51.4,48.2
