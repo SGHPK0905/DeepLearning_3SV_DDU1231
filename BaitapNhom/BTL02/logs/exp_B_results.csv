@@ -1,0 +1,4 @@
+Optimizer,Best_Val_Loss,Best_Val_Acc_Pct,Test_Acc_Pct,Macro_F1_Pct,Total_Time_Sec
+SGD_Momentum,1.142,57.25,56.8,54.6,230.15
+Adam,1.0542,61.35,60.88,58.74,231.26
+AdamW,1.0318,62.15,61.7,59.55,235.4
