@@ -1,0 +1,8 @@
+﻿model,params,metric_name,score_pct,val_loss,train_time_s,dataset_source
+GaussianMLP,257,R2 Score (%),99.93,1e-06,12.44,Gaussian 2D Grid (32x32 / 10x10)
+MNIST_MLP,669706,Test Acc (%),98.46,0.0616,65.69,MNIST Real (60k / 10k)
+MNIST_CNN,1817610,Test Acc (%),96.4,0.0969,65.23,MNIST Real (15k / 3k)
+Emotion_CNN,19028287,Test Acc (%),22.33,1.8515,128.96,FER-2013 Real (1200 / 300)
+CNN+LSTM,1748097,R2 Score (%),79.35,2.3866,31.89,MNIST Sequences Real (1200 / 300)
+SegNet,574229,Pixel Acc (%),81.46,0.8357,126.76,depth_hand.zip Real (240 / 80)
+CarDetectorCNN,83367,Test Acc (%),94.33,0.2539,8.61,car_data.zip Real (1000 imgs)
