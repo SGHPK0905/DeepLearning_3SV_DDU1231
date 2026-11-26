@@ -21,7 +21,7 @@
 ---
 
 ## 2. Điều chỉnh Phạm vi Dữ liệu so với Proposal ban đầu
-- **Tập dữ liệu triển khai chính thức:** **Flickr8k** (~8.091 ảnh đời thực, 40.455 chú thích tiếng Anh, chia theo chuẩn **Karpathy Split**: `6.000 train / 1.000 val / 1.000 test`, tách theo ảnh để chống data leakage).
+- **Tập dữ liệu triển khai chính thức:** **Flickr8k** trích từ [`jxie/flickr8k`](https://huggingface.co/datasets/jxie/flickr8k) (đã đóng gói sẵn theo **Karpathy Split**: `6.000 train / 1.000 val / 1.000 test` = `8.000` ảnh, `40.000` captions gốc, còn `39.981` câu hợp lệ sau khử trùng lặp; từ điển `2.538` tokens fit riêng trên Train với `min_freq = 5`; `0` ảnh trùng giữa 3 tập). *(So với bản Kaggle `adityajn105/flickr8k` có 8.091 ảnh và `captions.txt`, bản `jxie/flickr8k` dùng chuẩn 8.000 ảnh Karpathy và lưu thành `captions.csv` kèm cột `split`).*
 - **Lý do điều chỉnh từ Flickr30k (Proposal) sang Flickr8k:** Nhằm đảm bảo tính khả thi về tài nguyên tính toán (RTX 3050 4GB VRAM / Google Colab T4 giới hạn phiên) và thời hạn hoàn thành (`14/12/2026`), giúp nhóm chạy đầy đủ và công bằng toàn bộ **Baseline + Attention + ViT + 4 Ablation Studies + Multi-seed (`mean ± std`)** thay vì chạy thiếu kiểm chứng trên tập lớn.
 - **Hướng mở rộng tương lai:** Mở rộng quy mô huấn luyện sang **Flickr30k** (31.783 ảnh) và MS-COCO sẽ được phân tích trong **Chương 5 (Hướng phát triển tương lai)**.
 
@@ -69,10 +69,14 @@ PROJECT CK/
 ├── notebooks/
 │   ├── 01_eda_and_vocab.ipynb
 │   └── 02_error_analysis_and_attention.ipynb
+├── references/               # 9 bài báo khoa học gốc (PDF), README & BibTeX
 ├── src/
 │   ├── __init__.py
 │   ├── config.py             # Seed, paths, hyperparams (min_freq=5, Flickr8k)
-│   ├── dataset.py            # Vocabulary, Flickr8kDataset, collate_fn
+│   ├── download_data.py      # Tải jxie/flickr8k (HF) hoặc Kaggle zip
+│   ├── eda_preprocess.py     # EDA 300 DPI (WordCloud, Zipf), split chống leakage & vocab.pkl
+│   ├── extract_features.py   # Cache ResNet-50 global & spatial features
+│   ├── dataset.py            # Flickr8kDataset, CachedFeatureDataset, collate_fn
 │   ├── models/
 │   │   ├── __init__.py
 │   │   ├── baseline_cnn_lstm.py   # Model 1: Show and Tell (ResNet-50 + LSTM)

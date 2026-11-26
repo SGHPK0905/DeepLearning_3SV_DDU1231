@@ -8,6 +8,11 @@ Supports:
 import argparse
 import os
 import zipfile
+
+# Fix Xet hang/freeze on Windows & suppress symlink warning before importing huggingface/datasets
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+
 import pandas as pd
 from tqdm import tqdm
 

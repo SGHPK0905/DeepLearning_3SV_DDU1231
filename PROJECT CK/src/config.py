@@ -20,9 +20,9 @@ class Config:
     LOGS_DIR = os.path.join(BASE_DIR, "logs")
     FIGURES_DIR = os.path.join(BASE_DIR, "figures")
 
-    # Dataset (Flickr8k - Karpathy Split; Flickr30k deferred to Future Work)
+    # Dataset (Flickr8k - Karpathy Split via Hugging Face; Flickr30k deferred to Future Work)
     DATASET_NAME = "flickr8k"
-    DATASET_URL = "https://www.kaggle.com/datasets/adityajn105/flickr8k"
+    DATASET_URL = "https://huggingface.co/datasets/jxie/flickr8k"
     KARPATHY_SPLIT = {"train": 6000, "val": 1000, "test": 1000}
 
     # Image Preprocessing (ImageNet standard)
