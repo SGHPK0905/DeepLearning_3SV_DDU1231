@@ -1,21 +1,27 @@
 # Core Deep Learning & Vision
-torch>=2.0.0
-torchvision>=0.15.0
-transformers>=4.30.0
+torch>=2.1.0
+torchvision>=0.16.0
+timm>=0.9.12
+transformers>=4.36.0
+datasets>=2.16.0
+sentencepiece>=0.1.99
 
-# Data Processing & Utilities
+# Data Processing & Tracking
 numpy>=1.24.0
 pandas>=2.0.0
 pillow>=9.5.0
 tqdm>=4.65.0
-scikit-learn>=1.2.0
+scikit-learn>=1.3.0
+openpyxl>=3.1.2
+python-docx>=1.1.0
 
-# NLP & Metrics
+# NLP & Evaluation Metrics
 nltk>=3.8.1
 rouge-score>=0.1.2
+sacrebleu>=2.4.0
+evaluate>=0.4.1
 
-# Visualization & Demo App
+# Visualization & Web Demo
 matplotlib>=3.7.0
 seaborn>=0.12.0
 streamlit>=1.30.0
-

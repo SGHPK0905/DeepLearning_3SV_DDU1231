@@ -1,102 +1,104 @@
 # Xây dựng Quy trình Tự động Sinh Chú thích Ảnh và Chuyển ngữ Anh – Việt Thích ứng Ngữ cảnh
 ### A Deep Learning Pipeline for Automated Image Captioning and Context-Aware English-to-Vietnamese Translation
-**Đề tài Cuối kỳ Môn Học Sâu (Deep Learning) — Khoa Toán - Ứng dụng | Bộ môn Khoa học Dữ liệu — SGU**  
-**Nhóm 05**: Nguyễn Trương Cao Sơn (Nhóm trưởng), Đặng Thanh Phương, Phạm Trung Hiếu
+
+> **Học phần:** Học sâu (Deep Learning) — **Mã HP:** 858048 — **Lớp:** DDU1231  
+> **Trường:** Đại học Sài Gòn (SGU) — Khoa Toán - Ứng dụng | Bộ môn Khoa học Dữ liệu  
+> **Giảng viên hướng dẫn:** TS. Đỗ Như Tài  
+> **Repository chính thức:** [https://github.com/SGHPK0905/DeepLearning_3SV_DDU1231](https://github.com/SGHPK0905/DeepLearning_3SV_DDU1231)  
+> **Hạn nộp chốt cứng:** `14/12/2026`
 
 ---
 
-## 1. Tổng quan Đề tài
+## 1. Thông tin Nhóm & Tỷ lệ đóng góp (Tổng = 100%)
 
-Hệ thống xây dựng quy trình nối tầng 2 giai đoạn (**Two-Stage Cascaded Multimodal Pipeline**) kết hợp giữa Thị giác máy tính (Computer Vision) và Xử lý ngôn ngữ tự nhiên (NLP):
-1. **Giai đoạn 1 (Vision-to-Language Image Captioning trên PyTorch):** Tiếp nhận ảnh màu tự nhiên, trích xuất đặc trưng thị giác (CNN/ViT), kết hợp cơ chế chú ý (Spatial Attention) để sinh chuỗi chú thích tiếng Anh ($Y_{EN}$) chính xác trên tập dữ liệu chuẩn mực **Flickr30k**.
-2. **Giai đoạn 2 (Context-Aware Neural Machine Translation):** Tiếp nhận câu mô tả tiếng Anh, đưa qua mô hình Dịch máy nơ-ron (NMT) tiền huấn luyện chuyên sâu cho cặp ngôn ngữ Anh – Việt kết hợp kỹ thuật hậu xử lý làm mịn ngữ cảnh (Contextual Smoothing) để tạo câu chú thích tiếng Việt ($Y_{VI}$) tự nhiên, mượt mà và phù hợp với đời sống.
+| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ chính phụ trách | Đóng góp (%) |
+| :---: | :--- | :---: | :---: | :--- | :---: |
+| 1 | **Nguyễn Trương Cao Sơn** | `3123580040` | **Nhóm trưởng** | Thiết kế kiến trúc pipeline, config & `train.py`; trích xuất đặc trưng; triển khai mô hình mở rộng `ViT-B/16 + Transformer Decoder`; tổng hợp Ablation & Báo cáo. | **34%** |
+| 2 | **Đặng Thanh Phương** | `3123580036` | Thành viên | Tải, EDA & tiền xử lý **Flickr8k** (`dataset.py`, `vocab.pkl`); kiểm soát chống data leakage; triển khai & huấn luyện Baseline `CNN-LSTM` và `Attention-LSTM`. | **33%** |
+| 3 | **Phạm Trung Hiếu** | `3123580014` | Thành viên | Xây dựng bộ đánh giá multi-ref (`BLEU`, `METEOR`, `ROUGE-L`, `CIDEr`), Greedy/Beam Search; tích hợp `VietAI/envit5-translation` & chấm 100 ảnh; `app.py` (Streamlit) & Slide/Poster. | **33%** |
+| | **Tổng cộng** | | | | **100%** |
+
+---
+
+## 2. Điều chỉnh Phạm vi Dữ liệu so với Proposal ban đầu
+- **Tập dữ liệu triển khai chính thức:** **Flickr8k** (~8.091 ảnh đời thực, 40.455 chú thích tiếng Anh, chia theo chuẩn **Karpathy Split**: `6.000 train / 1.000 val / 1.000 test`, tách theo ảnh để chống data leakage).
+- **Lý do điều chỉnh từ Flickr30k (Proposal) sang Flickr8k:** Nhằm đảm bảo tính khả thi về tài nguyên tính toán (RTX 3050 4GB VRAM / Google Colab T4 giới hạn phiên) và thời hạn hoàn thành (`14/12/2026`), giúp nhóm chạy đầy đủ và công bằng toàn bộ **Baseline + Attention + ViT + 4 Ablation Studies + Multi-seed (`mean ± std`)** thay vì chạy thiếu kiểm chứng trên tập lớn.
+- **Hướng mở rộng tương lai:** Mở rộng quy mô huấn luyện sang **Flickr30k** (31.783 ảnh) và MS-COCO sẽ được phân tích trong **Chương 5 (Hướng phát triển tương lai)**.
+
+---
+
+## 3. Quy trình 2 Giai đoạn & Câu hỏi Nghiên cứu (RQs)
 
 ```text
-[Hình ảnh đầu vào]
+[Ảnh đầu vào (224x224x3)]
         │
-        ▼ (Giai đoạn 1: PyTorch Deep Learning)
+        ▼ (Giai đoạn 1: PyTorch Deep Learning trên Flickr8k)
 ┌────────────────────────────────────────────────────────┐
-│  Visual Encoder (ResNet-50 / ViT-B/16)                │
-│                         │ (Spatial Feature Maps / Patches)
-│                         ▼                              │
-│  Bahdanau Attention / Cross-Attention Mechanism        │
-│                         │ (Context Vector)             │
-│                         ▼                              │
-│  Language Decoder (LSTM / Transformer Decoder)        │
+│  Visual Encoder (ResNet-50 / ViT-B/16)                 │
+│        ▼                                               │
+│  Bahdanau Spatial Attention / Cross-Attention          │
+│        ▼                                               │
+│  Language Decoder (LSTM / Transformer Decoder)         │
+│  + Decoding (Greedy k=1 vs Beam Search k=3, 5, 7)      │
 └────────────────────────────────────────────────────────┘
         │
-        ▼ [Caption Tiếng Anh gốc (Flickr30k Benchmark)]
-        │   → Đánh giá: BLEU-1..4, METEOR, CIDEr
+        ▼ [Caption Tiếng Anh (Y_EN)] → BLEU-1..4, METEOR, ROUGE-L, CIDEr
         │
-        ▼ (Giai đoạn 2: Context-Aware NMT Module)
+        ▼ (Giai đoạn 2: Chuyển ngữ Anh – Việt thích ứng ngữ cảnh)
 ┌────────────────────────────────────────────────────────┐
-│  Pre-trained NMT Model (VinAI-Translate / EnViT5)     │
-│                         │                              │
-│  Contextual Smoothing & Entity Alignment Post-process  │
+│  Pre-trained NMT (VietAI/envit5-translation)           │
+│  + Đánh giá thủ công 100 ảnh test (Rubric 1–5)         │
 └────────────────────────────────────────────────────────┘
         │
-        ▼ [Caption Tiếng Việt tự nhiên, chuẩn ngữ cảnh]
-        │   → Đánh giá: BLEU-vi, Human Qualitative Score (1-5)
-        │
-        ▼ (Ứng dụng thực tế)
-[Giao diện Web Demo Streamlit: Ảnh + Attention Heatmap + Song ngữ Anh-Việt]
+        ▼ [Caption Tiếng Việt (Y_VI)] → Web Demo Streamlit + Attention Heatmap
 ```
 
----
-
-## 2. Câu hỏi nghiên cứu (Research Questions - RQs)
-
-1. **RQ1 (Về cơ chế chú ý - Spatial Attention):** Khi giữ nguyên bộ mã hóa ResNet-50 và bộ giải mã LSTM, việc bổ sung cơ chế chú ý không gian Bahdanau có cải thiện chất lượng chú thích tiếng Anh so với mô hình không sử dụng Attention hay không? Mức cải thiện được đo bằng BLEU-1 đến BLEU-4, METEOR và CIDEr.
-2. **RQ2 (Về cấu hình Encoder-Decoder & Transformer):** Trong cùng điều kiện dữ liệu và đánh giá, cấu hình ResNet-50 kết hợp LSTM có Attention và cấu hình ViT-B/16 kết hợp Transformer Decoder khác nhau như thế nào về chất lượng chú thích tiếng Anh và chi phí tính toán?
-3. **RQ3 (Về chiến lược giải mã & Trade-off):** Với cùng một mô hình đã huấn luyện, độ rộng Beam Search $k \in \{1, 3, 5, 7\}$ ảnh hưởng như thế nào đến chất lượng câu được sinh ra (BLEU, CIDEr) và thời gian suy luận (latency) trên mỗi ảnh?
+1. **RQ1 (Cơ chế chú ý):** Khi giữ nguyên ResNet-50 và LSTM, bổ sung Bahdanau Spatial Attention có cải thiện BLEU-1..4, METEOR, ROUGE-L và CIDEr so với mô hình không Attention không?
+2. **RQ2 (Cấu hình Encoder–Decoder):** Trong cùng điều kiện dữ liệu và đánh giá trên Flickr8k, cấu hình `ResNet-50 + Bahdanau Attention + LSTM` và `ViT-B/16 + Transformer Decoder` khác nhau thế nào về chất lượng caption và chi phí tính toán?
+3. **RQ3 (Chiến lược giải mã):** Trên cùng checkpoint đã huấn luyện, độ rộng Beam Search $k \in \{1, 3, 5, 7\}$ tác động ra sao đến BLEU/CIDEr và độ trễ suy luận (ms/ảnh)?
 
 ---
 
-## 3. Cấu trúc thư mục dự án (Project Directory)
+## 4. Cấu trúc Thư mục Dự án
 
 ```text
 PROJECT CK/
 ├── data/
-│   ├── raw/                  # Ảnh gốc và file annotations Flickr30k
-│   └── processed/            # File vocab.pkl, annotations train/val/test splits
-├── notebooks/                # Jupyter Notebooks EDA và chạy thử nghiệm nhanh
+│   ├── raw/                  # Ảnh Flickr8k & captions (bị ignore trên Git)
+│   └── processed/            # vocab.pkl, karpathy_splits.json, cached features
+├── notebooks/
 │   ├── 01_eda_and_vocab.ipynb
-│   └── 02_visualize_attention.ipynb
-├── src/                      # Source code chính viết bằng PyTorch
+│   └── 02_error_analysis_and_attention.ipynb
+├── src/
 │   ├── __init__.py
-│   ├── config.py             # Toàn bộ cấu hình siêu tham số và đường dẫn
-│   ├── dataset.py            # Custom Dataset, DataLoader và Collate Function
-│   ├── models/               # Các kiến trúc Deep Learning
+│   ├── config.py             # Seed, paths, hyperparams (min_freq=5, Flickr8k)
+│   ├── dataset.py            # Vocabulary, Flickr8kDataset, collate_fn
+│   ├── models/
 │   │   ├── __init__.py
-│   │   ├── baseline_cnn_lstm.py   # Baseline: ResNet-50 + LSTM (Show and Tell)
-│   │   ├── attention_model.py     # ResNet-50 + Bahdanau Attention + LSTM (Show, Attend & Tell)
-│   │   └── vit_transformer.py     # SOTA: ViT-B/16 + Transformer Decoder
-│   ├── translation.py        # Module chuyển ngữ Anh - Việt thích ứng ngữ cảnh
-│   ├── utils.py              # Đánh giá (BLEU, CIDEr), checkpoint, early stopping
-│   ├── train.py              # Script huấn luyện chính
-│   └── evaluate.py           # Script đánh giá trên tập Test
-├── experiments/              # Lưu model checkpoints (.pt) và loss logs
-├── app/                      # Web Demo tương tác
-│   └── app.py                # Giao diện tương tác Streamlit (Song ngữ & Attention Map)
-├── report/                   # Tài liệu báo cáo
-│   ├── Nhom05_ImageCaptioning_Proposal.docx
-│   └── Nhom05_ImageCaptioning_Proposal.pdf
-├── requirements.txt          # Các thư viện cần thiết
+│   │   ├── baseline_cnn_lstm.py   # Model 1: Show and Tell (ResNet-50 + LSTM)
+│   │   ├── attention_model.py     # Model 2: Show, Attend and Tell (Bahdanau Attention)
+│   │   └── vit_transformer.py     # Model 3: ViT-B/16 + Transformer Decoder
+│   ├── translation.py        # Module chuyển ngữ VietAI/envit5-translation
+│   ├── metrics.py            # Multi-ref BLEU-1..4, METEOR, ROUGE-L, CIDEr
+│   ├── inference.py          # Greedy Search & Beam Search (k=1,3,5,7)
+│   ├── train.py              # Script huấn luyện & lưu logs/checkpoints
+│   └── evaluate.py           # Đánh giá trên tập Test & xuất báo cáo lỗi
+├── checkpoints/              # Trọng số .pt (link tải Google Drive nếu >100MB)
+├── figures/                  # Biểu đồ 300 DPI, Attention heatmaps & sơ đồ diagrams/
+├── logs/                     # CSV history huấn luyện & ablation_results.csv
+├── app/
+│   └── app.py                # Web Demo Streamlit (Ảnh + Heatmap + Anh/Việt)
+├── report/
+│   ├── Nhom05_ImageCaptioning_Proposal.docx / .pdf
+│   └── Nhom05_BaoCao_CuoiKy.docx
+├── NhatKy_ThucNghiem_CK.xlsx # Sổ tay theo dõi tiến độ, thực nghiệm & nguồn hình ảnh
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 4. Kế hoạch Ablation Studies
-
-- **Ablation 1 (Trả lời RQ1)**: No-Attention (Baseline) vs. Bahdanau Spatial Attention vs. Scaled Dot-Product Attention.
-- **Ablation 2 (Trả lời RQ2)**: CNN Backbone (ResNet-50) vs. Vision Transformer (ViT-B/16).
-- **Ablation 3 (Trả lời RQ3)**: Greedy Search ($k=1$) vs. Beam Search ($k \in \{3, 5, 7\}$).
-- **Ablation 4 (Bổ trợ)**: Freeze toàn bộ Encoder vs. Fine-tune các tầng tích chập cuối cùng.
-
----
-
-## 5. Tài liệu Proposal chính thức
-Bản thuyết minh đề tài (Proposal) chuẩn 5 trang đã được đồng bộ tại:
-- [Nhom05_ImageCaptioning_Proposal.docx](file:///d:/Data-Science---SGU/Nam%204/DeepLearning/Team/PROJECT%20CK/report/Nhom05_ImageCaptioning_Proposal.docx)
-- [Nhom05_ImageCaptioning_Proposal.pdf](file:///d:/Data-Science---SGU/Nam%204/DeepLearning/Team/PROJECT%20CK/report/Nhom05_ImageCaptioning_Proposal.pdf)
+## 5. Tài liệu Theo dõi & Báo cáo
+- **Sổ tay Excel theo dõi hàng ngày & nguồn hình/pipeline:** [NhatKy_ThucNghiem_CK.xlsx](file:///d:/Data-Science---SGU/Nam%204/DeepLearning/Team/PROJECT%20CK/NhatKy_ThucNghiem_CK.xlsx)
+- **Khung Báo cáo Cuối kỳ (5 Chương + TOC):** [Nhom05_BaoCao_CuoiKy.docx](file:///d:/Data-Science---SGU/Nam%204/DeepLearning/Team/PROJECT%20CK/report/Nhom05_BaoCao_CuoiKy.docx)
+- **Proposal (đã cập nhật GitHub & phạm vi Flickr8k):** [Nhom05_ImageCaptioning_Proposal.pdf](file:///d:/Data-Science---SGU/Nam%204/DeepLearning/Team/PROJECT%20CK/report/Nhom05_ImageCaptioning_Proposal.pdf)
