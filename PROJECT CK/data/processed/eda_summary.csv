@@ -1,0 +1,2 @@
+dataset,split_mode,total_images,total_captions,train_images,train_captions,val_images,val_captions,test_images,test_captions,missing_images,train_raw_unique_words,vocab_size_after_min_freq,min_word_freq,avg_caption_length,median_caption_length,max_caption_length_observed,seed
+flickr8k,official_karpathy,8000,39981,6000,29983,1000,4999,1000,4999,0,7370,2538,5,10.84,10.0,37,42
